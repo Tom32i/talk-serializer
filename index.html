@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+
+        <title>Symfony Serialize</title>
+
+        <meta name="description" content="Retour sur un composant méconu">
+        <meta name="author" content="Thomas Jarrand">
+
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/black.css" id="theme">
+        <link rel="stylesheet" href="css/style.css">
+
+        <!-- Code syntax highlighting -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+        <div class="reveal">
+            <div class="slides">
+                <section data-background="img/grass.jpg">
+                    <h1>Symfony Serializer</h1>
+                    <hr>
+                    <h4>Un composant méconnu</h4>
+                </section>
+
+                <section>
+                    <h2>JMS Serializer</h2>
+                    <ul class="unstyled">
+                        <li class="fragment">
+                            👍 Clé en main
+                        </li>
+                        <li class="fragment">
+                            <a target="_blank" href="https://github.com/schmittjoh/JMSSerializerBundle/issues/293">
+                                👎 Rigide
+                            </a>
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Symfony Serializer</h2>
+                    <img src="img/serializer_workflow.png">
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Normalization</h2>
+                    </section>
+                    <section>
+                        <h3>Implemente <em>NormalizerInterface</em></h3>
+                        <pre><code>class UserNormalizer implements NormalizerInterface {}</code></pre>
+                    </section>
+                    <section>
+                        <h3>Affiche ton soutien !</h3>
+                        <pre><code data-trim>
+public function supportsNormalization($data, $format = null)
+{
+    return $data instanceof User;
+}
+                    </code></pre>
+                    </section>
+                    <section>
+                        <h3>Just do it</h3>
+                        <pre><code data-trim>
+public function normalize($object, $format = null, array $context = array())
+{
+    return [
+        'id'     => $object->getId(),
+        'name'   => $object->getName(),
+        'groups' => array_map(
+            function (Group $group) {
+                return $group->getId();
+            },
+            $object->getGroups()
+        )
+    ];
+}
+                    </code></pre>
+                    </section>
+                    <section>
+                        <h3>Résultat</h3>
+                        <pre><code data-trim>
+[
+    'id'     => 1,
+    'name'   => 'Foo Bar',
+    'groups' => [1, 2]
+]
+                    </code></pre>
+                    </section>
+                </section>
+
+
+                <section>
+                    <section>
+                        <h2>Associations</h2>
+                    </section>
+                    <section>
+                        <h3>Étends <em>SerializerAwareNormalizer</em></h3>
+                        <pre><code>class UserNormalizer extends SerializerAwareNormalizer implements NormalizerInterface {}</code></pre>
+                    </section>
+                    <section>
+                        <h3>Délegue</h3>
+                        <pre><code data-trim>
+public function normalize($object, $format = null, array $context = array())
+{
+    return [
+        // ...
+        'groups' => array_map(
+            function ($object) use ($format, $context) {
+                return $this->serializer->normalize($object, $format, $context);
+            },
+            $object->getGroups()
+        ),
+    ];
+}
+                    </code></pre>
+                    </section>
+                    <section>
+                        <h3>Complète ton serializer</h3>
+                        <pre><code data-trim>
+class GroupNormalizer extends SerializerAwareNormalizer implements NormalizerInterface
+{
+    public function normalize($object, $format = null, array $context = array())
+    {
+        return [
+            'id'   => $object->getId(),
+            'name' => $object->getName(),
+        ];
+    }
+
+    public function supportsNormalization($data, $format = null)
+    {
+        return $data instanceof Group;
+    }
+}
+                    </code></pre>
+                    </section>
+                    <section>
+                        <h3>Résultat:</h3>
+                        <pre><code data-trim>
+[
+    'id'        => 1,
+    'firstname' => 'Foo',
+    'lastname'  => 'Bar',
+    'groups'    => [
+        [
+            'id'   => 1,
+            'name' => 'FooFighters'
+        ],
+        [
+            'id'   => 2,
+            'name' => 'BarFighters'
+        ],
+    ],
+]
+                        </code></pre>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Quelques exemples</h2>
+                        <ul>
+                            <li class="fragment">
+                                <a href="https://gist.github.com/Tom32i/773de875f92322925bd3#file-datetimenormalizer-php">
+                                    DateTime
+                                </a>
+                            </li>
+                            <li class="fragment">
+                                <a href="https://gist.github.com/Tom32i/773de875f92322925bd3#file-collectionnormalizer-php">
+                                    Collection
+                                </a>
+                            </li>
+                            <li class="fragment">
+                                <a href="https://gist.github.com/Tom32i/773de875f92322925bd3#file-formerrornormalizer-php">
+                                    Form Error
+                                </a>
+                            </li>
+                            <li class="fragment">
+                                Entité
+                            </li>
+                        </ul>
+                    </section>
+                </section>
+
+                <section>
+                    <h2>Avantages</h2>
+                    <ul class="unstyled">
+                        <li class="fragment">
+                            👍 Separation of concern
+                        </li>
+                        <li class="fragment">
+                            👍 Plusieurs serlializer
+                        </li>
+                        <li class="fragment">
+                            👍 Supporte n'importe quel objet
+                        </li>
+                        <li class="fragment">
+                            👍 Tire parti des services
+                        </li>
+                    </ul>
+                </section>
+
+                <section data-background="img/doit.gif"></section>
+            </div>
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
+
+        <script>
+
+            // Full list of configuration options available at:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+
+                transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+                // Optional reveal.js plugins
+                dependencies: [
+                    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/zoom-js/zoom.js', async: true },
+                    { src: 'plugin/notes/notes.js', async: true }
+                ]
+            });
+        </script>
+    </body>
+</html>

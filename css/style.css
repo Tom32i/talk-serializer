@@ -1,0 +1,31 @@
+@import url(../lib/font/bitter/bitter.css);
+
+.reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5 {
+    font-family: "Bitter";
+}
+
+body {
+    background: #20211E;
+}
+
+.reveal a {
+    color: #767E34;
+}
+
+.reveal section[data-background] h1 {
+    text-shadow: 4px 4px 6px #20211E;
+}
+
+.reveal section[data-background] h2,
+.reveal section[data-background] h3,
+.reveal section[data-background] h4,
+.reveal section[data-background] h5,
+.reveal section[data-background] h6 {
+    text-shadow: 3px 3px 4px #20211E;
+}
+
+.reveal hr {
+    border: none;
+    background-color: white;
+    height: 1px;
+}
