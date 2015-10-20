@@ -43,7 +43,7 @@
                     <h4>Un composant méconnu</h4>
                 </section>
 
-                <section>
+                <section data-background="img/forge.gif">
                     <h2>JMS Serializer</h2>
                     <ul class="unstyled">
                         <li class="fragment">
@@ -63,8 +63,17 @@
                 </section>
 
                 <section>
-                    <section>
-                        <h2>Normalization</h2>
+                    <h2>Encodage</h2>
+                </section>
+
+                <section>
+                    <h2>Normalization</h2>
+                    <p class="fragment">💰 Valeur métier 💰</p>
+                </section>
+
+                <section>
+                    <section data-background="img/ripley.gif">
+                        <h2>Coding time!</h2>
                     </section>
                     <section>
                         <h3>Implemente <em>NormalizerInterface</em></h3>
@@ -177,6 +186,55 @@ class GroupNormalizer extends SerializerAwareNormalizer implements NormalizerInt
                     </section>
                 </section>
 
+                <section>
+                    <section>
+                        <h2>Composition</h2>
+                    </section>
+                    <section>
+                        <h3>Encoders:</h3>
+                        <pre><code data-trim>
+services:
+    # JSON Encoder
+    acme.encoder.json:
+        class: 'Symfony\Component\Serializer\Encoder\JsonEncoder'
+
+    # XML Encoder
+    acme.encoder.xml:
+        class: 'Symfony\Component\Serializer\Encoder\XmlEncoder'
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h3>Normalizers:</h3>
+                        <pre><code data-trim>
+services:
+    # User Normalizer
+    acme.normalizer.user:
+        class: 'Acme\Serializer\Normalizer\UserNormalizer'
+
+    # Group Normalizer
+    acme.normalizer.group:
+        class: 'Acme\Serializer\Normalizer\GroupNormalizer'
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h3>Serializers:</h3>
+                        <pre><code data-trim>
+services:
+    # Serializer
+    acme.serializer.default:
+        class: 'Symfony\Component\Serializer\Serializer'
+        arguments:
+            0:
+                - '@acme.normalizer.user'
+                - '@acme.normalizer.group'
+                - '@serializer.normalizer.object'
+            1:
+                - '@acme.encoder.json'
+                - '@acme.encoder.xml'
+                        </code></pre>
+                    </section>
+                </section>
                 <section>
                     <section>
                         <h2>Quelques exemples</h2>
