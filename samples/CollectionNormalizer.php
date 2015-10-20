@@ -45,7 +45,7 @@ class CollectionNormalizer extends SerializerAwareNormalizer implements Normaliz
     public function denormalize($data, $class, $format = null, array $context = array())
     {
         return new ArrayCollection(array_map(function ($item) use ($class, $format, $context) {
-            return $this->deserialize($item, $class, $format, $context);
+            return $this->serializer->denormalize($item, $class, $format, $context);
         }, $data));
     }
 }

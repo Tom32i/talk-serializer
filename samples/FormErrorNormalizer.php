@@ -17,7 +17,11 @@ class FormErrorNormalizer implements NormalizerInterface
      */
     public function supportsNormalization($data, $format = null)
     {
-        return is_object($data) && ($data instanceof FormError || $data instanceof FormErrorIterator);
+        if (!is_object($data)) {
+            return false;
+        }
+
+        return $data instanceof FormError || $data instanceof FormErrorIterator;
     }
 
     /**
