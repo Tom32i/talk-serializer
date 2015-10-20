@@ -29,3 +29,28 @@ body {
     background-color: white;
     height: 1px;
 }
+
+ul.unstyled {
+    list-style: none;
+}
+
+.reveal .card {
+    width: 50%;
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 0.8em;
+    margin-top: 10%;
+}
+.reveal .card a {
+    display: block;
+    color: #CCCCCC;
+    margin: 10px 0;
+}
+
+.reveal .photo {
+    max-width: 150px;
+    border-radius: 50%;
+    display: block;
+    margin: 10px auto;
+}
