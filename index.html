@@ -43,16 +43,39 @@
                     <h4>Un composant méconnu</h4>
                 </section>
 
-                <section data-background="img/forge.gif">
-                    <h2>JMS Serializer</h2>
-                    <ul class="unstyled">
+                <section>
+                    <h2>La serialisation</h2>
+                </section>
+
+                <section>
+                    <section data-background="img/forge.gif">
+                        <h2>JMS Serializer</h2>
+                    </section>
+                    <section>
+                        <ul class="unstyled">
+                            <li>
+                                👍 Clé en main
+                            </li>
+                            <li class="fragment">
+                                <a target="_blank" href="https://github.com/schmittjoh/JMSSerializerBundle/issues/293">
+                                    👎 Rigide
+                                </a>
+                            </li>
+                        </ul>
+                    </section>
+                </section>
+
+                <section>
+                    <h2>Reprendre la main</h2>
+                    <ul>
                         <li class="fragment">
-                            👍 Clé en main
+                            Cohérent
                         </li>
                         <li class="fragment">
-                            <a target="_blank" href="https://github.com/schmittjoh/JMSSerializerBundle/issues/293">
-                                👎 Rigide
-                            </a>
+                            Testé
+                        </li>
+                        <li class="fragment">
+                            Performant
                         </li>
                     </ul>
                 </section>
@@ -76,19 +99,6 @@
                         <h2>Coding time!</h2>
                     </section>
                     <section>
-                        <h3>Implemente <em>NormalizerInterface</em></h3>
-                        <pre><code>class UserNormalizer implements NormalizerInterface {}</code></pre>
-                    </section>
-                    <section>
-                        <h3>Affiches ton soutien !</h3>
-                        <pre><code data-trim>
-public function supportsNormalization($data, $format = null)
-{
-    return $data instanceof User;
-}
-                    </code></pre>
-                    </section>
-                    <section>
                         <h3>Just do it</h3>
                         <pre><code data-trim>
 public function normalize($object, $format = null, array $context = array())
@@ -103,6 +113,19 @@ public function normalize($object, $format = null, array $context = array())
             $object->getGroups()
         )
     ];
+}
+                    </code></pre>
+                    </section>
+                    <section>
+                        <h3>Implemente <em>NormalizerInterface</em></h3>
+                        <pre><code>class UserNormalizer implements NormalizerInterface {}</code></pre>
+                    </section>
+                    <section>
+                        <h3>Affiches ton soutien !</h3>
+                        <pre><code data-trim>
+public function supportsNormalization($data, $format = null)
+{
+    return $data instanceof User;
 }
                     </code></pre>
                     </section>
@@ -124,10 +147,6 @@ public function normalize($object, $format = null, array $context = array())
                         <h2>Associations</h2>
                     </section>
                     <section>
-                        <h3>Étends <em>SerializerAwareNormalizer</em></h3>
-                        <pre><code>class UserNormalizer extends SerializerAwareNormalizer implements NormalizerInterface {}</code></pre>
-                    </section>
-                    <section>
                         <h3>Délegue</h3>
                         <pre><code data-trim>
 public function normalize($object, $format = null, array $context = array())
@@ -143,6 +162,10 @@ public function normalize($object, $format = null, array $context = array())
     ];
 }
                     </code></pre>
+                    </section>
+                    <section>
+                        <h3>Étends <em>SerializerAwareNormalizer</em></h3>
+                        <pre><code>class UserNormalizer extends SerializerAwareNormalizer implements NormalizerInterface {}</code></pre>
                     </section>
                     <section>
                         <h3>Complète ton serializer</h3>
@@ -190,6 +213,25 @@ class GroupNormalizer extends SerializerAwareNormalizer implements NormalizerInt
                     <section data-background="img/potato.gif">
                         <h2>Composition</h2>
                     </section>
+
+                    <section>
+                        <h3>Serializer à la carte 👌</h3>
+                        <pre><code data-trim>
+services:
+    # Serializer
+    acme.serializer.default:
+        class: 'Symfony\Component\Serializer\Serializer'
+        arguments:
+            0:
+                - '@acme.normalizer.user'
+                - '@acme.normalizer.group'
+                - '@serializer.normalizer.object'
+            1:
+                - '@acme.encoder.json'
+                - '@acme.encoder.xml'
+                        </code></pre>
+                    </section>
+
                     <section>
                         <h3>Encoders:</h3>
                         <pre><code data-trim>
@@ -214,24 +256,6 @@ services:
     # Group Normalizer
     acme.normalizer.group:
         class: 'Acme\Serializer\Normalizer\GroupNormalizer'
-                        </code></pre>
-                    </section>
-
-                    <section>
-                        <h3>Serializers:</h3>
-                        <pre><code data-trim>
-services:
-    # Serializer
-    acme.serializer.default:
-        class: 'Symfony\Component\Serializer\Serializer'
-        arguments:
-            0:
-                - '@acme.normalizer.user'
-                - '@acme.normalizer.group'
-                - '@serializer.normalizer.object'
-            1:
-                - '@acme.encoder.json'
-                - '@acme.encoder.xml'
                         </code></pre>
                     </section>
                 </section>
@@ -259,19 +283,19 @@ services:
                     <h2>Avantages</h2>
                     <ul class="unstyled">
                         <li class="fragment">
+                            👍 Cohérent
+                        </li>
+                        <li class="fragment">
+                            👍 Testable
+                        </li>
+                        <li class="fragment">
+                            👍 Flexible
+                        </li>
+                        <li class="fragment">
                             👍 Separation of concern
                         </li>
                         <li class="fragment">
                             👍 Plusieurs serlializer
-                        </li>
-                        <li class="fragment">
-                            👍 Supporte n'importe quel objet
-                        </li>
-                        <li class="fragment">
-                            👍 Tire parti des services
-                        </li>
-                        <li class="fragment">
-                            👍 Testable
                         </li>
                     </ul>
                 </section>
